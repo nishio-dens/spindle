@@ -9,6 +9,11 @@ export default class App extends Component {
   }
 
   componentDidMount() {
+    // stop drag and drop
+    document.ondragover = document.ondrop = (e) => {
+      e.preventDefault()
+      return false
+    }
     this.openMenu()
   }
 
