@@ -16,4 +16,10 @@ app.on('ready', () => {
   mainWindow.on('closed', () => {
     mainWindow = null
   })
+
+  mainWindow.on('window-all-closed', () => {
+    if (process.platform != 'darwin') {
+      app.quit()
+    }
+  })
 })
