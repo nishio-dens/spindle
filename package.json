@@ -12,7 +12,6 @@
   "author": "nishio-dens",
   "license": "MIT",
   "dependencies": {
-    "photon": "https://github.com/connors/photon",
     "react": "^15.6.1",
     "react-dom": "^15.6.1"
   },
