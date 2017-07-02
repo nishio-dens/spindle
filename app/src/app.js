@@ -7,6 +7,8 @@ const nodePath = require('path')
 export default class App extends Component {
   constructor(props) {
     super(props)
+
+    this.updateWindowSize = this.updateWindowSize.bind(this)
   }
 
   componentDidMount() {
@@ -24,17 +26,33 @@ export default class App extends Component {
     imagePanel.onDragend = () => {
       return false
     }
+    let that = this
     imagePanel.ondrop = (e) => {
       e.preventDefault()
       const file = e.dataTransfer.files[0]
       const path = nodePath.resolve(file.path)
       console.log(path)
 
-      document.getElementById('main-window-image').src = path
+      let canvas = document.getElementById('main-window-canvas')
+      var ctx = canvas.getContext('2d')
+      var img = new Image()
+      img.src = path
+      that.img = img
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, 300, 150)
+      }
 
       return false
     }
     this.openMenu()
+
+    // resize
+    window.addEventListener('resize', this.updateWindowSize)
+    this.updateWindowSize()
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateWindowSize)
   }
 
   openMenu() {
@@ -61,6 +79,24 @@ export default class App extends Component {
       e.preventDefault()
       menu.popup(remote.getCurrentWindow())
     }, false)
+  }
+
+  updateWindowSize() {
+    const mainWindow = document.getElementById('main-window-content')
+    const canvas = document.getElementById('main-window-canvas')
+    let { offsetWidth, offsetHeight } = mainWindow
+    offsetWidth = offsetWidth - 220 // TODO: fixme
+    console.log(`${offsetWidth} ${offsetHeight}`)
+    canvas.setAttribute('width', offsetWidth.toString())
+    canvas.setAttribute('height', offsetHeight.toString())
+
+    let ctx = canvas.getContext('2d')
+    ctx.fillStyle = 'black'
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    console.log(`canvas size ${canvas.width} ${canvas.height}`)
+
+    ctx.drawImage(this.img, 0, 0, offsetWidth, offsetHeight)
   }
 
   render() {
@@ -107,7 +143,7 @@ export default class App extends Component {
           </div>
         </header>
 
-        <div className="window-content">
+        <div className="window-content" id="main-window-content">
           <div className="pane-group">
             <div className="pane-sm sidebar">
               <div className="pane">
@@ -135,8 +171,8 @@ export default class App extends Component {
               </div>
             </div>
 
-            <div className="pane" id="main-window-image-panel">
-              <img src="" id="main-window-image"></img>
+            <div className="pane hidden-pane" id="main-window-image-panel">
+              <canvas id="main-window-canvas"></canvas>
             </div>
           </div>
         </div>
