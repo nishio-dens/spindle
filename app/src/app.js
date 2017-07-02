@@ -1,10 +1,11 @@
-import React, {Component} from 'react'
+import React from 'react'
 import {} from './styles/global.scss'
+import Drawer from './lib/drawer/drawer'
 
 const remote = require('electron').remote
 const nodePath = require('path')
 
-export default class App extends Component {
+export default class App extends React.Component {
   constructor(props) {
     super(props)
 
@@ -33,20 +34,21 @@ export default class App extends Component {
       const path = nodePath.resolve(file.path)
       console.log(path)
 
-      let canvas = document.getElementById('main-window-canvas')
-      var ctx = canvas.getContext('2d')
-      var img = new Image()
-      img.src = path
-      that.img = img
-      img.onload = () => {
-        ctx.drawImage(img, 0, 0, 300, 150)
-      }
+       let canvas = document.getElementById('main-window-canvas')
+       var ctx = canvas.getContext('2d')
+       var img = new Image()
+       img.src = path
+       that.img = img
+       img.onload = () => {
+         ctx.drawImage(img, 0, 0, 300, 150)
+       }
 
       return false
     }
     this.openMenu()
 
-    // resize
+
+    this.drawer = this.refs.drawer
     window.addEventListener('resize', this.updateWindowSize)
     this.updateWindowSize()
   }
@@ -83,20 +85,11 @@ export default class App extends Component {
 
   updateWindowSize() {
     const mainWindow = document.getElementById('main-window-content')
-    const canvas = document.getElementById('main-window-canvas')
-    let { offsetWidth, offsetHeight } = mainWindow
-    offsetWidth = offsetWidth - 220 // TODO: fixme
-    console.log(`${offsetWidth} ${offsetHeight}`)
-    canvas.setAttribute('width', offsetWidth.toString())
-    canvas.setAttribute('height', offsetHeight.toString())
-
-    let ctx = canvas.getContext('2d')
-    ctx.fillStyle = 'black'
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-    console.log(`canvas size ${canvas.width} ${canvas.height}`)
-
-    ctx.drawImage(this.img, 0, 0, offsetWidth, offsetHeight)
+    const sidebarWidth = 220 // FIXME
+    let width, height
+    width = mainWindow.offsetWidth - sidebarWidth
+    height = mainWindow.offsetHeight
+    this.drawer.updateWindowSize(width, height)
   }
 
   render() {
@@ -172,7 +165,7 @@ export default class App extends Component {
             </div>
 
             <div className="pane hidden-pane" id="main-window-image-panel">
-              <canvas id="main-window-canvas"></canvas>
+              <Drawer ref="drawer" />
             </div>
           </div>
         </div>
