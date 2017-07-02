@@ -13,51 +13,56 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
-    // stop drag and drop
-    document.ondragover = document.ondrop = (e) => {
-      e.preventDefault()
-      return false
-    }
-
-    // drag
-    let imagePanel = document.getElementById('main-window-image-panel')
-    imagePanel.ondragover = () => {
-      return false
-    }
-    imagePanel.onDragend = () => {
-      return false
-    }
-    let that = this
-    imagePanel.ondrop = (e) => {
-      e.preventDefault()
-      const file = e.dataTransfer.files[0]
-      const path = nodePath.resolve(file.path)
-      console.log(path)
-
-       let canvas = document.getElementById('main-window-canvas')
-       var ctx = canvas.getContext('2d')
-       var img = new Image()
-       img.src = path
-       that.img = img
-       img.onload = () => {
-         ctx.drawImage(img, 0, 0, 300, 150)
-       }
-
-      return false
-    }
-    this.openMenu()
-
-
     this.drawer = this.refs.drawer
+
+    this.initializeDragAndDrop()
+
     window.addEventListener('resize', this.updateWindowSize)
     this.updateWindowSize()
+
+    this.initializeMenu()
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.updateWindowSize)
   }
 
-  openMenu() {
+  initializeDragAndDrop() {
+    // stop global drag and drop
+    document.ondragover = document.ondrop = (e) => {
+      e.preventDefault()
+      return false
+    }
+    // setup image panel drag and drop
+    let imagePanel = document.getElementById('main-window-image-panel')
+    imagePanel.ondragover = () => { return false }
+    imagePanel.onDragend = () => { return false }
+    let that = this
+    imagePanel.ondrop = (e) => {
+      e.preventDefault()
+      if (e.dataTransfer.files.length <= 0) {
+        return
+      }
+
+      // FIXME: load files
+      let preloadImages = []
+      for (let i = 0; i < e.dataTransfer.files.length; i++) {
+        const file = e.dataTransfer.files[i]
+        preloadImages.push({
+          key: nodePath.resolve(file.path),
+          path: nodePath.resolve(file.path)
+        })
+      }
+      const firstFile = e.dataTransfer.files[0]
+      this.refs.drawer.loadImages(preloadImages, () => {
+        let firstFileKey = nodePath.resolve(firstFile.path)
+        that.refs.drawer.drawTargetImage(firstFileKey)
+      })
+      return false
+    }
+  }
+
+  initializeMenu () {
     const Menu = remote.Menu;
     const MenuItem = remote.MenuItem;
     var menu = new Menu();

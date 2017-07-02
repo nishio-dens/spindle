@@ -7,7 +7,7 @@ export default class Drawer extends React.Component {
     this.canvasWidth = 300
     this.canvasHeight = 300
     this.currentImage = null
-    this.images = null
+    this.images = {}
   }
 
   componentDidMount() {
@@ -27,29 +27,34 @@ export default class Drawer extends React.Component {
   // Preload Images
   // @params image
   // [{ key: "KEY", path: Path }]
-  preloadImages(imgs) {
-    if (this.images === null) {
-      this.images = {}
-    }
+  loadImages(imgs, onComplete = null) {
     for (let v of imgs) {
       let img = new Image()
-      img.path = img
       this.images[v.key] = {
         path: v.path,
-        image: image,
+        image: img,
         loaded: false
       }
+      img.src = v.path
+
       img.onload = () => {
         this.images[v.key].loaded = true
+        console.log("Loaded " + v.key)
+
+        if (Object.keys(this.images).every(k => this.images[k].loaded === true)) {
+          if (onComplete) {
+            onComplete()
+          }
+        }
       }
     }
   }
 
   clearPreloadImages() {
-    this.images = null
+    this.images = {}
   }
 
-  drawImage(key) {
+  drawTargetImage(key) {
     let image = this.images[key]
     if (!image) {
       console.log("Image Not Found " + key)
@@ -62,9 +67,8 @@ export default class Drawer extends React.Component {
 
   drawImage() {
     if (this.currentImage) {
-      this.canvasContext.drawImage(image.image, 0, 0, 300, 300)
+      this.canvasContext.drawImage(this.currentImage.image, 0, 0, this.canvasWidth, this.canvasHeight)
     }
-    console.log("DRAW " + this.canvasWidth + " " + this.canvasHeight)
   }
 
   render() {
