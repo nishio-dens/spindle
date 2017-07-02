@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import {} from './styles/global.scss'
 
 const remote = require('electron').remote
+const nodePath = require('path')
 
 export default class App extends Component {
   constructor(props) {
@@ -12,6 +13,25 @@ export default class App extends Component {
     // stop drag and drop
     document.ondragover = document.ondrop = (e) => {
       e.preventDefault()
+      return false
+    }
+
+    // drag
+    let imagePanel = document.getElementById('main-window-image-panel')
+    imagePanel.ondragover = () => {
+      return false
+    }
+    imagePanel.onDragend = () => {
+      return false
+    }
+    imagePanel.ondrop = (e) => {
+      e.preventDefault()
+      const file = e.dataTransfer.files[0]
+      const path = nodePath.resolve(file.path)
+      console.log(path)
+
+      document.getElementById('main-window-image').src = path
+
       return false
     }
     this.openMenu()
@@ -115,8 +135,8 @@ export default class App extends Component {
               </div>
             </div>
 
-            <div className="pane">
-              Main
+            <div className="pane" id="main-window-image-panel">
+              <img src="" id="main-window-image"></img>
             </div>
           </div>
         </div>
