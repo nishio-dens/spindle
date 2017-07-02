@@ -1,9 +1,45 @@
 import React, {Component} from 'react'
 import {} from './styles/global.scss'
 
+const remote = require('electron').remote
+
 export default class App extends Component {
+  constructor(props) {
+    super(props)
+  }
+
+  componentDidMount() {
+    this.openMenu()
+  }
+
+  openMenu() {
+    const Menu = remote.Menu;
+    const MenuItem = remote.MenuItem;
+    var menu = new Menu();
+    menu.append(new MenuItem({
+      label: 'Menu',
+      accelerator: '1',
+      click: function() {
+        alert('Hello Menu');
+      }
+    }));
+    menu.append(new MenuItem({
+      label: 'SubMenu',
+      submenu: [
+        {
+          label: '1'
+        },
+      ]
+    }));
+
+    document.getElementById('main-window-sidebar-queue').addEventListener('contextmenu', function (e) {
+      e.preventDefault()
+      menu.popup(remote.getCurrentWindow())
+    }, false)
+  }
+
   render() {
-   return (
+    return (
       <div className="window">
         <header className="toolbar toolbar-header draggable">
           <h1 className="title">Spindle</h1>
@@ -50,7 +86,7 @@ export default class App extends Component {
           <div className="pane-group">
             <div className="pane-sm sidebar">
               <div className="pane">
-                <table className="table-striped">
+                <table className="table-striped" id="main-window-sidebar-queue">
                   <thead>
                   <tr>
                     <th>Filename</th>
