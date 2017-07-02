@@ -1,4 +1,8 @@
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const extractSass = new ExtractTextPlugin({
+  filename: "[name].[contenthash].css",
+  disable: process.env.NODE_ENV === "development"
+});
 
 module.exports = {
   watch: true,
@@ -13,7 +17,7 @@ module.exports = {
   },
 
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.jsx?$/,
         loader: 'babel-loader',
@@ -22,27 +26,33 @@ module.exports = {
         }
       },
       {
-        test: /\.css$/,
-        loader: ExtractTextPlugin.extract({
-          use: 'css-loader'
-        })
-      },
-      {
         test: /\.(png|jpg|gif|svg)$/,
         loader: 'file-loader',
         query: {
           name: '[name].[ext]?[hash]'
         }
-      }
-    ]
+      },
+      {
+        test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        loader: "url-loader?limit=1000000&mimetype=application/font-woff"
+      },
+      {
+        test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        loader: "file-loader"
+      },
+      {
+        test: /\.scss$/,
+        use: extractSass.extract({
+          use: [{
+            loader: "css-loader"
+          }, {
+            loader: "sass-loader"
+          }],
+        })
+      }]
   },
 
   plugins: [
-    new ExtractTextPlugin({
-        filename: 'bundle.css',
-        disable: false,
-        allChunks: true
-      }
-    )
+    extractSass
   ]
 }
