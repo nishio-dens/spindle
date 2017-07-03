@@ -39,7 +39,8 @@ export default class Drawer extends React.Component {
 
       img.onload = () => {
         this.images[v.key].loaded = true
-        console.log("Loaded " + v.key)
+        this.images[v.key].width = img.width
+        this.images[v.key].height = img.height
 
         if (Object.keys(this.images).every(k => this.images[k].loaded === true)) {
           if (onComplete) {
@@ -67,7 +68,56 @@ export default class Drawer extends React.Component {
 
   drawImage() {
     if (this.currentImage) {
-      this.canvasContext.drawImage(this.currentImage.image, 0, 0, this.canvasWidth, this.canvasHeight)
+      this.canvasContext.fillStyle = 'black'
+      this.canvasContext.fillRect(0, 0, this.canvasWidth, this.canvasHeight)
+
+      const rect = this._fitWindowRect(this.currentImage, this.canvasWidth, this.canvasHeight)
+      this.canvasContext.drawImage(
+        this.currentImage.image,
+        rect.x, rect.y,
+        rect.width, rect.height
+      )
+    } else {
+      this.canvasContext.fillStyle = 'black'
+      this.canvasContext.fillRect(0, 0, this.canvasWidth, this.canvasHeight)
+    }
+  }
+
+  _fitWindowRect(iobj, canvasWidth, canvasHeight) {
+    let { width, height } = iobj
+    let drawWidth, drawHeight, x, y
+
+    if ( width < height ) {
+      drawWidth = width * (canvasHeight / height)
+      drawHeight = canvasHeight
+      if (drawWidth > canvasWidth) {
+        drawWidth = drawWidth
+        drawHeight = drawHeight * (canvasHeight / drawHeight)
+        x = 0
+        y = (canvasHeight - drawHeight) / 2.0
+      } else {
+        x = (canvasWidth - drawWidth) / 2.0
+        y = 0
+      }
+    } else {
+      drawWidth = canvasWidth
+      drawHeight = height * (canvasWidth / width)
+      if (drawHeight > canvasHeight) {
+        drawWidth = drawWidth * (canvasHeight / drawHeight)
+        drawHeight = canvasHeight
+        x = (canvasWidth - drawWidth) / 2.0
+        y = 0
+      } else {
+        x = 0
+        y = (canvasHeight - drawHeight) / 2.0
+      }
+    }
+
+    return {
+      x: x,
+      y: y,
+      width: drawWidth,
+      height: drawHeight
     }
   }
 
