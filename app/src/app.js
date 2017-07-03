@@ -174,11 +174,6 @@ export default class App extends React.Component {
             </div>
           </div>
         </div>
-
-        <footer className="toolbar toolbar-footer">
-          <h1 className="title">Footer</h1>
-        </footer>
-
       </div>
    )
   }
