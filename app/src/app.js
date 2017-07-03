@@ -1,6 +1,6 @@
 import React from 'react'
 import {} from './styles/global.scss'
-import Drawer from './lib/drawer/drawer'
+import Drawer from './lib/drawer'
 
 const remote = require('electron').remote
 const nodePath = require('path')
