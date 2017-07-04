@@ -1,5 +1,6 @@
 const electron = require('electron')
 const {app, BrowserWindow} = electron
+const loadDevtool = require('electron-load-devtool')
 
 require('electron-reload')(__dirname)
 
@@ -12,6 +13,8 @@ app.on('ready', () => {
     'acceptFirstMouse': true
   })
   mainWindow.loadURL(`file://${__dirname}/app/index.html`)
+  loadDevtool(loadDevtool.REDUX_DEVTOOLS)
+  mainWindow.openDevTools()
 
   mainWindow.on('closed', () => {
     mainWindow = null
