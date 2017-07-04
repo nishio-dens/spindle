@@ -1,31 +1,31 @@
-import React from 'react'
+import React from 'react';
 
-import {} from '../styles/global.scss'
-import Drawer from '../lib/drawer'
+import {} from '../styles/global.scss';
+import Drawer from '../lib/drawer';
 
-const remote = require('electron').remote
+const remote = require('electron').remote;
 
 export default class App extends React.Component {
   constructor(props) {
-    super(props)
+    super(props);
 
-    this.updateWindowSize = this.updateWindowSize.bind(this)
+    this.updateWindowSize = this.updateWindowSize.bind(this);
     this.initializeDragAndDrop = this.props.initializeDragAndDrop.bind(this)
   }
 
   componentDidMount() {
-    this.drawer = this.refs.drawer
+    this.drawer = this.refs.drawer;
 
-    this.initializeDragAndDrop()
+    this.initializeDragAndDrop();
 
-    window.addEventListener('resize', this.updateWindowSize)
-    this.updateWindowSize()
+    window.addEventListener('resize', this.updateWindowSize);
+    this.updateWindowSize();
 
-    this.initializeMenu()
+    this.initializeMenu();
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.updateWindowSize)
+    window.removeEventListener('resize', this.updateWindowSize);
   }
 
   initializeMenu () {
@@ -49,18 +49,18 @@ export default class App extends React.Component {
     }));
 
     document.getElementById('main-window-sidebar-queue').addEventListener('contextmenu', function (e) {
-      e.preventDefault()
+      e.preventDefault();
       menu.popup(remote.getCurrentWindow())
     }, false)
   }
 
   updateWindowSize() {
-    const mainWindow = document.getElementById('main-window-content')
-    const sidebarWidth = 220 // FIXME
-    let width, height
-    width = mainWindow.offsetWidth - sidebarWidth
-    height = mainWindow.offsetHeight
-    this.drawer.updateWindowSize(width, height)
+    const mainWindow = document.getElementById('main-window-content');
+    const sidebarWidth = 220; // FIXME
+    let width, height;
+    width = mainWindow.offsetWidth - sidebarWidth;
+    height = mainWindow.offsetHeight;
+    this.drawer.updateWindowSize(width, height);
   }
 
   render() {

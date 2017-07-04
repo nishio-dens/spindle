@@ -4,5 +4,5 @@ export function addFileGroup(group) {
   return {
     type: FILE_GROUP_ADD,
     group
-  }
+  };
 }
