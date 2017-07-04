@@ -1,15 +1,16 @@
 import React from 'react'
+
 import {} from '../styles/global.scss'
 import Drawer from '../lib/drawer'
 
 const remote = require('electron').remote
-const nodePath = require('path')
 
 export default class App extends React.Component {
   constructor(props) {
     super(props)
 
     this.updateWindowSize = this.updateWindowSize.bind(this)
+    this.initializeDragAndDrop = this.props.initializeDragAndDrop.bind(this)
   }
 
   componentDidMount() {
@@ -25,41 +26,6 @@ export default class App extends React.Component {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.updateWindowSize)
-  }
-
-  initializeDragAndDrop() {
-    // stop global drag and drop
-    document.ondragover = document.ondrop = (e) => {
-      e.preventDefault()
-      return false
-    }
-    // setup image panel drag and drop
-    let imagePanel = document.getElementById('main-window-image-panel')
-    imagePanel.ondragover = () => { return false }
-    imagePanel.onDragend = () => { return false }
-    let that = this
-    imagePanel.ondrop = (e) => {
-      e.preventDefault()
-      if (e.dataTransfer.files.length <= 0) {
-        return
-      }
-
-      // FIXME: load files
-      let preloadImages = []
-      for (let i = 0; i < e.dataTransfer.files.length; i++) {
-        const file = e.dataTransfer.files[i]
-        preloadImages.push({
-          key: nodePath.resolve(file.path),
-          path: nodePath.resolve(file.path)
-        })
-      }
-      const firstFile = e.dataTransfer.files[0]
-      this.refs.drawer.loadImages(preloadImages, () => {
-        let firstFileKey = nodePath.resolve(firstFile.path)
-        that.refs.drawer.drawTargetImage(firstFileKey)
-      })
-      return false
-    }
   }
 
   initializeMenu () {
